@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Card, CardContent, List, ListItem, ListItemText, Tabs, Tab } from '@mui/material';
-import { categories, transactions } from '../../data'; // Импортируем данные
+import { categories } from '../../data'; // Импортируем категории
 import AddTransactionModal from '../Blocks/AddTransactionModal';
 
 // Функция для подсчета суммы
@@ -10,13 +10,40 @@ const getTotalAmount = (transactions) => {
 
 const Main_Page = () => {
   const [balance, setBalance] = useState(0);
-  const [incomeTransactions, setIncomeTransactions] = useState(transactions.income); // Поступления
-  const [expenseTransactions, setExpenseTransactions] = useState(transactions.expense); // Расходы
+  const [incomeTransactions, setIncomeTransactions] = useState([]); // Поступления
+  const [expenseTransactions, setExpenseTransactions] = useState([]); // Расходы
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('income'); // 'income' или 'expense'
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTab, setSelectedTab] = useState(0); // Для табов: 0 - Поступления, 1 - Расходы
   const [timeFilter, setTimeFilter] = useState('month'); // Фильтр по времени: 'today', 'month', 'year'
+
+  // Функция для загрузки данных из LocalStorage
+  const loadDataFromLocalStorage = () => {
+    const savedIncomeTransactions = localStorage.getItem('incomeTransactions');
+    const savedExpenseTransactions = localStorage.getItem('expenseTransactions');
+    return {
+      incomeTransactions: savedIncomeTransactions ? JSON.parse(savedIncomeTransactions) : [],
+      expenseTransactions: savedExpenseTransactions ? JSON.parse(savedExpenseTransactions) : [],
+    };
+  };
+
+  // Функция для сохранения данных в LocalStorage
+  const saveDataToLocalStorage = (incomeTransactions, expenseTransactions) => {
+    localStorage.setItem('incomeTransactions', JSON.stringify(incomeTransactions));
+    localStorage.setItem('expenseTransactions', JSON.stringify(expenseTransactions));
+  };
+
+  // Загружаем данные при монтировании компонента
+  useEffect(() => {
+    const { incomeTransactions, expenseTransactions } = loadDataFromLocalStorage();
+    setIncomeTransactions(incomeTransactions);
+    setExpenseTransactions(expenseTransactions);
+
+    // Пересчитываем баланс
+    const totalBalance = getTotalAmount(incomeTransactions) + getTotalAmount(expenseTransactions);
+    setBalance(totalBalance);
+  }, []);
 
   const handleAddTransaction = (transaction) => {
     const newTransaction = {
@@ -26,9 +53,13 @@ const Main_Page = () => {
 
     // Добавляем транзакцию в состояние
     if (modalType === 'income') {
-      setIncomeTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
+      const updatedIncomeTransactions = [...incomeTransactions, newTransaction];
+      setIncomeTransactions(updatedIncomeTransactions);
+      saveDataToLocalStorage(updatedIncomeTransactions, expenseTransactions);
     } else {
-      setExpenseTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
+      const updatedExpenseTransactions = [...expenseTransactions, newTransaction];
+      setExpenseTransactions(updatedExpenseTransactions);
+      saveDataToLocalStorage(incomeTransactions, updatedExpenseTransactions);
     }
 
     // Обновляем баланс
@@ -129,7 +160,7 @@ const Main_Page = () => {
                 }}
               >
                 <List>
-                  {filteredIncomeTransactions.map((transaction) => (
+                  {filteredIncomeTransactions.reverse().map((transaction) => (
                     <ListItem key={transaction.id}>
                       <ListItemText
                         primary={transaction.description}
@@ -161,7 +192,7 @@ const Main_Page = () => {
                 }}
               >
                 <List>
-                  {filteredExpenseTransactions.map((transaction) => (
+                  {filteredExpenseTransactions.reverse().map((transaction) => (
                     <ListItem key={transaction.id}>
                       <ListItemText
                         primary={transaction.description}

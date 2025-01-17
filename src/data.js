@@ -6,64 +6,24 @@ export const categories = {
     expense: ['Продукты', 'Транспорт', 'Развлечения', 'ЖКХ', 'Одежда', 'Медицина'],
 };
 
-// Массив транзакций (разделён на расходы и поступления)
-export const transactions = {
-    income: [
-        {
-            "description": "Зарплата",
-            "amount": 20000,
-            "category": "Зарплата",
-            "date": "2025-01-17",
-            "time": "16:09:45",
-            "id": 1
-        },
-        {
-            "description": "Дивиденды",
-            "amount": 2000,
-            "category": "Дивиденды",
-            "date": "2025-01-16",
-            "time": "16:13:02",
-            "id": 2
-        },
-        {
-            "description": "Зарплата",
-            "amount": 1,
-            "category": "Зарплата",
-            "date": "2025-01-17",
-            "time": "16:13:17",
-            "id": 3
-        },
-        {
-            "description": "Зарплата",
-            "amount": 12,
-            "category": "Зарплата",
-            "date": "2025-01-17",
-            "time": "16:13:46",
-            "id": 4
-        },
-        {
-            "description": "Зарплата",
-            "amount": 12,
-            "category": "Зарплата",
-            "date": "2025-01-17",
-            "time": "16:13:49",
-            "id": 5
-        },
-        {
-            "description": "Зарплата",
-            "amount": 12,
-            "category": "Зарплата",
-            "date": "2025-01-17",
-            "time": "16:13:52",
-            "id": 6
-        }
-    ],
-    expense: [],
+const loadData = () => {
+    const savedData = localStorage.getItem('transactions');
+    if (savedData) {
+        return JSON.parse(savedData);
+    }
+    // Если данных нет, возвращаем дефолтные значения
+    return {
+        income: [],
+        expense: [],
+    };
 };
+
+export const transactions = loadData()
 
 // Функция для добавления новой транзакции
 export const addTransaction = (newTransaction, type) => {
     transactions[type].push(newTransaction);
+    console.log(transactions)
 };
 
 // Функция для получения транзакций по категории
