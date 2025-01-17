@@ -1,5 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 
+let isDarkMode = localStorage.getItem('isDarkMode');
+
 const theme = createTheme({
     palette: {
         primary: {
@@ -9,10 +11,10 @@ const theme = createTheme({
             main: '#FF9800',
         },
         background: {
-            default: '#F5F5F5',
+            default: isDarkMode == 'true' ? '#000000d9' : '#F5F5F5',
         },
         text: {
-            primary: '#212121',
+            primary: isDarkMode == 'true' ? '#fff' : '#212121',
             secondary: '#757575',
         },
     },

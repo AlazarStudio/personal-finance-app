@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Card, CardContent, List, ListItem, ListItemText, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { categories } from '../../data'; // Импортируем категории
 import AddTransactionModal from '../Blocks/AddTransactionModal';
+import theme from '../../theme';
 
 // Функция для подсчета суммы
 const getTotalAmount = (transactions) => {
@@ -16,7 +17,7 @@ const Main_Page = () => {
   const [modalType, setModalType] = useState('income'); // 'income' или 'expense'
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTab, setSelectedTab] = useState(0); // Для табов: 0 - Поступления, 1 - Расходы
-  const [timeFilter, setTimeFilter] = useState('month'); // Фильтр по времени: 'today', 'month', 'year'
+  const [timeFilter, setTimeFilter] = useState(localStorage.getItem('selectedFilter') ? localStorage.getItem('selectedFilter') : 'month'); // Фильтр по времени: 'today', 'month', 'year'
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Для модального окна подтверждения удаления
   const [transactionToDelete, setTransactionToDelete] = useState(null); // Транзакция для удаления
 
@@ -139,9 +140,9 @@ const Main_Page = () => {
   return (
     <Box sx={{ p: 2 }}>
       {/* Блок баланса */}
-      <Card sx={{ mb: 2 }}>
+      <Card sx={{ mb: 2, background: theme.palette.background.default }}>
         <CardContent>
-          <Typography variant="h5" align="center">
+          <Typography variant="h5" align="center" color="primary">
             Текущий баланс
           </Typography>
           <Typography variant="h4" align="center" color="primary" sx={{ mt: 1 }}>

@@ -67,7 +67,7 @@ const Analytics = () => {
     const [incomeTransactions, setIncomeTransactions] = useState([]);
     const [expenseTransactions, setExpenseTransactions] = useState([]);
     const [selectedTab, setSelectedTab] = useState(0); // Состояние для табов: 0 - доходы, 1 - расходы
-    const [timeFilter, setTimeFilter] = useState('month'); // Фильтр по времени: 'today', 'month', 'year', 'all'
+    const [timeFilter, setTimeFilter] = useState(localStorage.getItem('selectedFilter') ? localStorage.getItem('selectedFilter') : 'month'); // Фильтр по времени: 'today', 'month', 'year', 'all'
 
     // Загружаем данные при монтировании компонента
     useEffect(() => {

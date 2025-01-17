@@ -6,6 +6,7 @@ import PieChartIcon from '@mui/icons-material/PieChart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import Paper from '@mui/material/Paper';
 import { useNavigate } from 'react-router-dom';
+import theme from '../../theme';
 
 const BottomNav = () => {
     const [value, setValue] = useState(0);
@@ -50,9 +51,9 @@ const BottomNav = () => {
             elevation={3}
         >
             <BottomNavigation value={value} onChange={handleChange}>
-                <BottomNavigationAction label="Главная" icon={<RestoreIcon />} />
-                <BottomNavigationAction label="Аналитика" icon={<PieChartIcon />} />
-                <BottomNavigationAction label="Настройки" icon={<SettingsIcon />} />
+                <BottomNavigationAction label="Главная" icon={<RestoreIcon />} sx={{ background: theme.palette.background.default }} />
+                <BottomNavigationAction label="Аналитика" icon={<PieChartIcon />} sx={{ background: theme.palette.background.default }} />
+                <BottomNavigationAction label="Настройки" icon={<SettingsIcon />} sx={{ background: theme.palette.background.default }} />
             </BottomNavigation>
         </Paper>
     );

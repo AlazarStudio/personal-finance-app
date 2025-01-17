@@ -8,7 +8,7 @@ const Header = () => {
         <AppBar position="static">
             <Toolbar>
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', color: '#fff' }}>
-                    Personal Finance App
+                    Персональные личные финансы
                 </Typography>
             </Toolbar>
         </AppBar>
