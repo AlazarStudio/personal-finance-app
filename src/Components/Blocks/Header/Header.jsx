@@ -1,12 +1,18 @@
-import React from "react";
-import classes from './Header.module.css';
+import React from 'react';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
 
-function Header({ children, ...props }) {
-    return ( 
-        <>
-            Header
-        </>
-     );
-}
+const Header = () => {
+    return (
+        <AppBar position="static">
+            <Toolbar>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', color: '#fff' }}>
+                    Personal Finance App
+                </Typography>
+            </Toolbar>
+        </AppBar>
+    );
+};
 
 export default Header;
