@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Button, Card, CardContent, List, ListItem, ListItemText, Tabs, Tab } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, List, ListItem, ListItemText, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { categories } from '../../data'; // Импортируем категории
 import AddTransactionModal from '../Blocks/AddTransactionModal';
 
@@ -17,6 +17,8 @@ const Main_Page = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedTab, setSelectedTab] = useState(0); // Для табов: 0 - Поступления, 1 - Расходы
   const [timeFilter, setTimeFilter] = useState('month'); // Фильтр по времени: 'today', 'month', 'year'
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false); // Для модального окна подтверждения удаления
+  const [transactionToDelete, setTransactionToDelete] = useState(null); // Транзакция для удаления
 
   // Функция для загрузки данных из LocalStorage
   const loadDataFromLocalStorage = () => {
@@ -44,30 +46,6 @@ const Main_Page = () => {
     const totalBalance = getTotalAmount(incomeTransactions) + getTotalAmount(expenseTransactions);
     setBalance(totalBalance);
   }, []);
-
-  const handleAddTransaction = (transaction) => {
-    const newTransaction = {
-      ...transaction,
-      id: modalType === 'income' ? incomeTransactions.length + 1 : expenseTransactions.length + 1,
-    };
-
-    // Добавляем транзакцию в состояние
-    if (modalType === 'income') {
-      const updatedIncomeTransactions = [...incomeTransactions, newTransaction];
-      setIncomeTransactions(updatedIncomeTransactions);
-      saveDataToLocalStorage(updatedIncomeTransactions, expenseTransactions);
-    } else {
-      const updatedExpenseTransactions = [...expenseTransactions, newTransaction];
-      setExpenseTransactions(updatedExpenseTransactions);
-      saveDataToLocalStorage(incomeTransactions, updatedExpenseTransactions);
-    }
-
-    // Обновляем баланс
-    setBalance((prevBalance) => prevBalance + transaction.amount);
-
-    // Закрываем модальное окно
-    setIsModalOpen(false);
-  };
 
   // Фильтрация транзакций по времени
   const filterTransactionsByDate = (transactions) => {
@@ -97,6 +75,65 @@ const Main_Page = () => {
   // Функция для смены вкладки
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
+  };
+
+  const handleAddTransaction = (transaction) => {
+    const newTransaction = {
+      ...transaction,
+      id: modalType === 'income' ? incomeTransactions.length + 1 : expenseTransactions.length + 1,
+    };
+
+    // Добавляем транзакцию в состояние
+    if (modalType === 'income') {
+      const updatedIncomeTransactions = [...incomeTransactions, newTransaction];
+      setIncomeTransactions(updatedIncomeTransactions);
+      saveDataToLocalStorage(updatedIncomeTransactions, expenseTransactions);
+    } else {
+      const updatedExpenseTransactions = [...expenseTransactions, newTransaction];
+      setExpenseTransactions(updatedExpenseTransactions);
+      saveDataToLocalStorage(incomeTransactions, updatedExpenseTransactions);
+    }
+
+    // Обновляем баланс
+    setBalance((prevBalance) => prevBalance + transaction.amount);
+
+    // Закрываем модальное окно
+    setIsModalOpen(false);
+  };
+
+  // Открытие модального окна для удаления
+  const handleOpenDeleteDialog = (transaction) => {
+    setTransactionToDelete(transaction);
+    setOpenDeleteDialog(true);
+  };
+
+  // Закрытие модального окна для удаления
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setTransactionToDelete(null);
+  };
+
+  // Удаление транзакции
+  const handleDeleteTransaction = () => {
+    if (!transactionToDelete) return;
+
+    const { id, type } = transactionToDelete;
+
+    if (type === 'income') {
+      const updatedIncomeTransactions = incomeTransactions.filter((transaction) => transaction.id !== id);
+      setIncomeTransactions(updatedIncomeTransactions);
+      saveDataToLocalStorage(updatedIncomeTransactions, expenseTransactions);
+    } else {
+      const updatedExpenseTransactions = expenseTransactions.filter((transaction) => transaction.id !== id);
+      setExpenseTransactions(updatedExpenseTransactions);
+      saveDataToLocalStorage(incomeTransactions, updatedExpenseTransactions);
+    }
+
+    // Обновляем баланс
+    setBalance((prevBalance) => prevBalance - transactionToDelete.amount);
+
+    // Закрываем диалог
+    setOpenDeleteDialog(false);
   };
 
   return (
@@ -150,22 +187,14 @@ const Main_Page = () => {
               Сумма поступлений: {getTotalAmount(filteredIncomeTransactions).toLocaleString()} ₽
             </Typography>
             {filteredIncomeTransactions.length > 0 ? (
-              <Box
-                sx={{
-                  maxHeight: 'calc(100dvh - 445px)',
-                  overflowY: 'auto',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  bgcolor: 'background.paper',
-                }}
-              >
+              <Box sx={{ maxHeight: 'calc(100dvh - 445px)', overflowY: 'auto', border: '1px solid #e0e0e0', borderRadius: '8px', bgcolor: 'background.paper' }}>
                 <List>
                   {filteredIncomeTransactions.reverse().map((transaction) => (
                     <ListItem key={transaction.id}>
-                      <ListItemText
-                        primary={transaction.description}
-                        secondary={`${transaction.amount > 0 ? '+' : ''}${transaction.amount.toLocaleString()} ₽`}
-                      />
+                      <ListItemText primary={transaction.description} secondary={`${transaction.amount > 0 ? '+' : ''}${transaction.amount.toLocaleString()} ₽`} />
+                      <Button variant="outlined" color="error" onClick={() => handleOpenDeleteDialog({ ...transaction, type: 'income' })}>
+                        Удалить
+                      </Button>
                     </ListItem>
                   ))}
                 </List>
@@ -182,22 +211,14 @@ const Main_Page = () => {
               Сумма расходов: {getTotalAmount(filteredExpenseTransactions).toLocaleString()} ₽
             </Typography>
             {filteredExpenseTransactions.length > 0 ? (
-              <Box
-                sx={{
-                  maxHeight: 'calc(100dvh - 445px)',
-                  overflowY: 'auto',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '8px',
-                  bgcolor: 'background.paper',
-                }}
-              >
+              <Box sx={{ maxHeight: 'calc(100dvh - 445px)', overflowY: 'auto', border: '1px solid #e0e0e0', borderRadius: '8px', bgcolor: 'background.paper' }}>
                 <List>
                   {filteredExpenseTransactions.reverse().map((transaction) => (
                     <ListItem key={transaction.id}>
-                      <ListItemText
-                        primary={transaction.description}
-                        secondary={`${transaction.amount > 0 ? '+' : ''}${transaction.amount.toLocaleString()} ₽`}
-                      />
+                      <ListItemText primary={transaction.description} secondary={`${transaction.amount > 0 ? '+' : ''}${transaction.amount.toLocaleString()} ₽`} />
+                      <Button variant="outlined" color="error" onClick={() => handleOpenDeleteDialog({ ...transaction, type: 'expense' })}>
+                        Удалить
+                      </Button>
                     </ListItem>
                   ))}
                 </List>
@@ -209,7 +230,23 @@ const Main_Page = () => {
         )}
       </Box>
 
-      {/* Модальное окно */}
+      {/* Модальное окно подтверждения удаления */}
+      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
+        <DialogTitle>Подтверждение удаления</DialogTitle>
+        <DialogContent>
+          <Typography>Вы уверены, что хотите удалить эту транзакцию?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="secondary">
+            Отмена
+          </Button>
+          <Button onClick={handleDeleteTransaction} color="primary">
+            Удалить
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Модальное окно добавления транзакции */}
       <AddTransactionModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

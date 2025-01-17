@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import RestoreIcon from '@mui/icons-material/Restore';
@@ -11,8 +11,19 @@ const BottomNav = () => {
     const [value, setValue] = useState(0);
     const navigate = useNavigate();
 
+    // Восстанавливаем выбранную вкладку из localStorage при монтировании компонента
+    useEffect(() => {
+        const savedValue = localStorage.getItem('bottomNavValue');
+        if (savedValue) {
+            setValue(Number(savedValue)); // Преобразуем значение в число
+        }
+    }, []);
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
+        // Сохраняем выбранную вкладку в localStorage
+        localStorage.setItem('bottomNavValue', newValue);
+
         switch (newValue) {
             case 0:
                 navigate('/'); // Главная страница
