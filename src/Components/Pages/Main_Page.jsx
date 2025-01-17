@@ -161,13 +161,13 @@ const Main_Page = () => {
 
           {/* Кнопки для фильтрации по времени */}
           <Box sx={{ display: 'flex', justifyContent: 'space-around', mt: 2, gap: '10px' }}>
-            <Button sx={{ width: '33%', fontSize: '12px', color: timeFilter === 'today' ? '#fff' : 'success' }} variant={timeFilter === 'today' ? 'contained' : 'outlined'} onClick={() => setTimeFilter('today')}>
+            <Button sx={{ width: '33%', fontSize: '10px', color: timeFilter === 'today' ? '#fff' : 'success' }} variant={timeFilter === 'today' ? 'contained' : 'outlined'} onClick={() => setTimeFilter('today')}>
               Сегодня
             </Button>
-            <Button sx={{ width: '33%', fontSize: '12px', color: timeFilter === 'month' ? '#fff' : 'success' }} variant={timeFilter === 'month' ? 'contained' : 'outlined'} onClick={() => setTimeFilter('month')}>
+            <Button sx={{ width: '33%', fontSize: '10px', color: timeFilter === 'month' ? '#fff' : 'success' }} variant={timeFilter === 'month' ? 'contained' : 'outlined'} onClick={() => setTimeFilter('month')}>
               За месяц
             </Button>
-            <Button sx={{ width: '33%', fontSize: '12px', color: timeFilter === 'year' ? '#fff' : 'success' }} variant={timeFilter === 'year' ? 'contained' : 'outlined'} onClick={() => setTimeFilter('year')}>
+            <Button sx={{ width: '33%', fontSize: '10px', color: timeFilter === 'year' ? '#fff' : 'success' }} variant={timeFilter === 'year' ? 'contained' : 'outlined'} onClick={() => setTimeFilter('year')}>
               За год
             </Button>
           </Box>
